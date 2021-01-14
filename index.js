@@ -8,6 +8,17 @@ const axios = require('axios').default
 var session = require('express-session')
 var compression = require('compression')
 var bodyParser = require('body-parser');
+const { Pool } = require('pg');
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
+});
+
+
+
+
 
 const routes = require('./login/routes')
 const i = require('./quiz/auxi')
@@ -58,6 +69,24 @@ app.get('/', async (req, res, next) => {
 
 
 })
+.get('/db', async (req, res) => {
+    try {
+      const client = await pool.connect();
+      const result = await client.query('SELECT * FROM test_table');
+      const results = { 'results': (result) ? result.rows : null};
+      res.render('pages/db', results );
+      client.release();
+    } catch (err) {
+      console.error(err);
+      res.send("Error " + err);
+    }
+  })
+
+
+
+
+
+
 
 app.post('/search', async function(req, res, next) {
 
