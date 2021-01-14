@@ -1,0 +1,94 @@
+<%- include('header.html') %>
+<main>
+    <div>
+
+
+        <h2>
+            Lets Play Guess The Plant!
+        </h2>
+
+        <% if(!user.loggedIn){ %>
+
+            <a href="./login">Log In</a>
+            <a href="./login">Sign Up</a>
+
+        <% } %>
+
+
+    </div>
+
+    <% if (user.loggedIn) { %>
+
+        <h2>
+            Welcome <%= user.name %>
+        </h2>
+
+        <h3 id="score">
+            Your Score is : <%= user.score %>
+        </h3>
+
+        <div>
+
+
+            <label for="quiztype">What version do you want to play</label>
+            
+          
+            <select name="quiztype" id="quizType" >
+
+                <option value="nameguess" >
+                    Guess The Name
+                </option>
+
+                <option value="picguess">
+                    Guess The Picture
+                </option>
+
+            </select>
+
+            <!-- Use Jquery AJAX to start -->
+            <button id="startGame">Go!</button>
+
+        </div>
+
+
+
+
+
+
+
+        <div id="game">
+
+
+
+            <div id="gameQ"></div>
+
+            <div id="result"></div>
+
+
+            <div class="answer-container">
+
+            <div class="answer" id="ansA">A</div>
+            <div class="answer" id="ansB">B</div>
+            <div class="answer" id="ansC">C</div>
+            <div class="answer" id="ansD">D</div>
+            
+            </div>
+            
+
+
+
+        </div>
+
+
+
+
+
+
+    <% } %>
+
+
+
+
+</main>
+
+<%- include('footer.html') %>

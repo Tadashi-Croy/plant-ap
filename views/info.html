@@ -1,0 +1,104 @@
+<%- include('header.html') %>
+
+    <main>
+        <h2>
+            Detailed Plant Information
+        </h2>
+        <h3>
+            <%= plant.common_name.substring(0,1).toUpperCase() + plant.common_name.substring(1,) %>
+        </h3>
+        <p> <%= plant.scientific_name || 'No Scientific Name' %> </p>
+
+        <div>
+
+            <h4>
+                Taxonomy Information
+            </h4>
+
+            <div>
+                <p>
+                    Family: <%= plant.family.name  %>
+                </p>
+                <p>
+                    Genus: <%= plant.genus.name  %>
+                </p>
+                <p>
+                    Species: <%= (plant.main_species.scientific_name)? plant.main_species.scientific_name : 'N/A'   %>
+                </p>
+            </div>
+
+            <div>
+                <h4>
+                    Observed in: 
+                </h4>
+
+                    <p>
+                        <%= plant.main_species.observations %>
+                    </p>
+
+            </div>
+
+        </div>
+
+
+        <div>
+
+            <% if (plant.main_species.edible){ %>
+                <p>
+                    <%= ` ${plant.common_name} is edible!` %>
+                </p>
+                <br>
+                <p>Here's what you can eat:</p>
+                <ul>
+                    <%# for(let part of plant.main_species.edible_part){ %>
+
+                        <li> <%# part %> </li>
+
+                    <%# } %>
+                </ul>
+            <% } else{ %>
+
+                <p>
+                    <%= `${ plant.common_name} is NOT edible` %>
+
+                </p>
+
+              <% } %>
+
+        </div>
+
+
+
+
+
+
+    <div>
+        <h4>
+            Other Scientific Names (Synonyms):
+        </h4>
+        <ul>
+            <% for (let item of plant.main_species.synonyms){ %>
+
+
+                <li>
+                    <%= item.name %>
+                </li>
+            
+            
+           <% } %>
+
+        </ul>
+
+    </div>
+            
+        <div>
+            <img src=<%= plant.image_url %> alt=<%= plant.common_name %> >
+           
+        </div>
+
+
+
+
+    </main>
+
+<%- include('footer.html') %>

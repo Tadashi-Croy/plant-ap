@@ -1,0 +1,70 @@
+a{
+    color: black;
+    text-decoration: none;
+
+}
+/* 
+main{
+    
+
+
+} */
+
+
+.card{
+
+    border: 1px solid black;
+    width: fit-content;
+    padding: .5rem;
+
+
+}
+.card-test{
+    color: blue;
+    border: 1px solid black;
+    width: fit-content;
+    padding: .5rem;
+    cursor: pointer;
+
+
+}
+
+.card-test:hover{
+    transform: scale(1.1);
+
+
+}
+img{
+    height: 200px;
+    width:200px;
+
+}
+
+.img-200{
+    
+}
+
+.answer-container{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr; 
+    margin: auto;
+}
+
+.correct{
+    color: rgb(9, 233, 9);
+    
+}
+.incorrect{
+    color: red;
+    width: fit-content;
+}
+
+
+
+
+
+
+
+
+

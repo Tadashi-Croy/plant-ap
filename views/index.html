@@ -1,0 +1,51 @@
+
+<%- include('header.html') %>
+
+<main>
+
+    <div class = 'test' style= "color: red;">
+        <h1>
+            Planti.API
+        </h1>
+    </div>
+    <hr />
+
+    <a  href= './info?q=potd' > test </a>
+
+    <form action="./search" method="post"> 
+
+        <label for= " searchBy"> Search By: </label>
+        <select name="searchBy">
+            <option value = 'common' >Common Name</option>
+            <option value = 'regionals' >Location/Region</option>
+        </select>	
+
+
+        <input name = 'userInput' type= 'text' placeholder= "Enter Search Query"> 
+        
+        <input id ='searchSubmit' type = "submit" value= "Search" />
+        
+    </form>
+
+    <button id="potd" >Plant of the Day</button>
+
+
+    <% if (item) { %>
+
+        <div>
+        <% for (let i of item){ %>
+
+        
+        <h2 class= "card" >
+            <a  href= <%= `./info?q=${i[1]}` %> >
+            <%- i %>
+            </a>
+        </h2>
+
+        <% } %>
+        </div>
+    <% } %>
+
+</main>
+
+<%- include('footer.html') %>
