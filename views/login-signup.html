@@ -6,6 +6,9 @@
     <div>
         <h2>Log In</h2> 
 
+        <% if(user.message){ %>
+             <h3 class="err"> <%=user.message%> </h3> 
+        <% } %>
         <form id='loginForm' action="./login" method="post">
 
             <label for="username"> Enter Username</label>

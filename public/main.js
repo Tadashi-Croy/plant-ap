@@ -27,7 +27,7 @@ if(quizType){
     var sess 
 
     $(startGame).click(gameChooser)
-    
+    $(quizType).change(cleanUp)
 
 }
 
@@ -58,6 +58,9 @@ async function gameChooser() {
     let rData = ii
     let aNodes = answers
     let gameType = quizType.value
+    console.log(ii)
+    console.log(gameType)
+    console.log(answers)
 
     resultsAnalyzer(rData,aNodes, gameType)
 
@@ -132,7 +135,7 @@ function resultsAnalyzer(rData, aNodes, gameType){
 
                 scoreNode.innerText = `Your Score is : ${scoreVal}`
             })
-            window.sessionStorage.clear()
+            // window.sessionStorage.clear()
             $(aNodes).map((item)=>{return $(answers[item]).off('click')})
             
         })
@@ -146,5 +149,40 @@ async function saveScore() {
 }
 
 
+async function cleanUp(){
+    $(answers).empty().removeClass('card-test')
+    $(result).empty()
+    $(gameQ).empty()
+   
+
+    $.ajax({
+            type: 'DELETE',
+            data: window.sessionStorage.getItem('id'),
+            url:'./quizhtml/',
+            success: ()=>{
+                console.log('Success')
+            },
 
 
+    }).done((err)=>{
+        console.log(err)
+    })
+    
+    window.sessionStorage.clear()
+    
+}
+
+if(window.location.pathname === '/search'){
+    
+    if($('#choices')[0].innerText == 'Invalid Input'){
+        $('#choices').addClass('invalid')
+        $('.card a').click(()=>{
+            event.preventDefault()
+        })
+        console.log('here')
+    }else{
+        console.log($('#choices')[0].innerText)
+    }
+    $('.card')
+
+}

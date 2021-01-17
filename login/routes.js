@@ -1,63 +1,30 @@
-const Database = require("@replit/database")
+
 const bcrypt = require('bcrypt');
 const saltRounds = 1;
-const db = new Database()
+const { Client } = require('pg')
+const format = require('pg-format');
+const util = require('util')
 
-const pgp = require('pg-promise') ()
-
-
-const cn = {
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    database: process.env.DB_DATABASE,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    max: 20
-};
-
-
-const db1 = pgp(cn);
-
-exports.dataB = db
-
-exports.db1 = db1
-// Preparing the connection details:
-// const cn = 'postgres://username:password@host:port/database';
-
-// Creating a new database instance from the connection details:
-// const db = pgp(cn);
-
-// Exporting the database object for shared use:
-// module.exports = db;
-// const cn = {
-//     host: 'localhost',
-//     port: 5432,
-//     database: 'my-database-name',
-//     user: 'user-name',
-//     password: 'user-password',
-//     max: 30 // use up to 30 connections
-
-//     // "types" - in case you want to set custom type parsers on the pool level
-// };
-
-
-
-exports.findUser = async function(username){
+const loginUser = async function(userInfo, client){
+    let user= await findUser(userInfo.username, client)
+    return [user[0][1], user[0][2]]
     
-    let user = await db.get(username.username)
-
-    if (user !== null){
-        
-
-        return user
-       
-    }
-    else{
-        return false
-    }
-
 }
 
+const findUser = async function(username, client){
+    let sql = format("SELECT name, password, score FROM my_db WHERE name = %L ", username)
+    
+    let result = await client.query({
+        rowMode : 'array',
+        text : sql
+        }
+    )
+    .then((item)=>{
+        return item.rows
+    })
+
+    return result
+}
 
 exports.verifyUser = async function(password, hash){
      
@@ -73,12 +40,88 @@ exports.verifyUser = async function(password, hash){
 
 
 
-exports.newUser = function (userInfo){
+newUser = async function (userInfo, client){
     
-    bcrypt.hash(userInfo.userPass, saltRounds, function(err, hash) {
-    // Store hash in your password DB.
-        db.set(userInfo.username, {hash: hash, score: 0})
-    });
+    let a = await findUser(userInfo.username, client)
+    
+    if(a.length){
+        return 'Username Taken'
+    }
+    else{
+        bcrypt.hash(userInfo.userPass, saltRounds, function(err, hash) {
+            let sql = format("INSERT INTO my_db(name, password, score) VALUES(%L,%L, 0);", userInfo.username, hash)
+            
+            client.query(sql, (err, res) => {
+                if (err) throw err;
+
+                client.end();       
+            })  
+            })
+    }
+    return 1
+}
+
+
+exports.conn = function (op,data){
+
+    const client = new Client({
+    user: process.env.PGUSER,
+    host: process.env.PGHOST,
+    database: process.env.PGDATABASE,
+    password: process.env.PGPASSWORD,
+    port: process.env.PGPORT,
+    ssl: {
+        rejectUnauthorized: false,
+        sslmode : 'require',
+    },
+        
+    })
+
+    client.connect();
+    
+    switch(op){
+
+        case 'login':
+            let c = loginUser(data, client)
+            return c
+    
+        case 'newUser':
+           
+            let b = newUser(data, client)
+
+            return b
+        
+        case 'deleteUser':
+            deleteUser()
+
+            break
+        default:
+            client.end()
+            
+    }
 
 }
+
+exports.saveScore = function(user){
+    let sql = format("UPDATE my_db SET score = score + 10 WHERE name = %L", user)
+    const client = new Client({
+    user: process.env.PGUSER,
+    host: process.env.PGHOST,
+    database: process.env.PGDATABASE,
+    password: process.env.PGPASSWORD,
+    port: process.env.PGPORT,
+    ssl: {
+        rejectUnauthorized: false,
+        sslmode : 'require',
+    },
+        
+    })
+    client.connect()
+
+    client.query(sql, (res, err)=>{
+        client.end()  
+    })
+
+}
+
 

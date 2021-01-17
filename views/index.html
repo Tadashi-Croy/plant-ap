@@ -3,14 +3,12 @@
 
 <main>
 
-    <div class = 'test' style= "color: red;">
+    <div class = 'head-h1' >
         <h1>
             Planti.API
         </h1>
     </div>
     <hr />
-
-    <a  href= './info?q=potd' > test </a>
 
     <form action="./search" method="post"> 
 
@@ -26,25 +24,32 @@
         <input id ='searchSubmit' type = "submit" value= "Search" />
         
     </form>
+    
+    <a  href= './info?q=potd' ><button id="potd" >Plant of the Day</button></a>
 
-    <button id="potd" >Plant of the Day</button>
 
+    <% if (item[0] !== -1) { %>
 
-    <% if (item) { %>
-
-        <div>
+        <div id="choices">
         <% for (let i of item){ %>
 
         
         <h2 class= "card" >
             <a  href= <%= `./info?q=${i[1]}` %> >
-            <%- i %>
+            <%- (Array.isArray(i))? i[0]: i %>
             </a>
         </h2>
 
         <% } %>
         </div>
+    <% } else {%>
+    <h2 class="card"> No Results Found</h2>
+
     <% } %>
+
+
+
+
 
 </main>
 

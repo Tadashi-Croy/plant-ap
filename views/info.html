@@ -50,11 +50,11 @@
                 <br>
                 <p>Here's what you can eat:</p>
                 <ul>
-                    <%# for(let part of plant.main_species.edible_part){ %>
+                    <% for(let part of plant.main_species.edible_part){ %>
 
-                        <li> <%# part %> </li>
+                        <li> <%= part %> </li>
 
-                    <%# } %>
+                    <% } %>
                 </ul>
             <% } else{ %>
 

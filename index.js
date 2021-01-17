@@ -1,27 +1,23 @@
 const express = require('express');
 const path = require('path')
+
 const pgp = require('pg-promise')
-var $ = require('jquery')
+
 const app = express();
-require('dotenv').config()
+
 const axios = require('axios').default
-var session = require('express-session')
+var cookieSession = require('cookie-session')
+
+
+
 var compression = require('compression')
 var bodyParser = require('body-parser');
-const { Pool } = require('pg');
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
-});
-
-
-
-
 
 const routes = require('./login/routes')
-const i = require('./quiz/auxi')
+const auxi = require('./quiz/auxi')
+
+
+
 
 
 app.use(compression())
@@ -30,63 +26,56 @@ app.use(express.urlencoded({ extended: true }))
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+const updated = require('./updates.js')
 
 
 app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'html');
 
-// app.use('/static', express.static(path.join(__dirname, 'public')))
 
-app.use(session({
-    // store: new (require('connect-pg-simple')(session))(),
-    secret: 'secret',
-    resave: true,
-    saveUninitialized: true,
-    cookie: { maxAge: 60000 },
-  
+app.use(cookieSession({
+  name: 'session',
+  keys: ['apple', 'orange'],
 
-}));
+  maxAge: 24 * 60 * 60 * 1000, 
+  loggedIn: false,
+}))
+
+
+
+
+
+
+
 
 app.use(express.static("public"))
 
 
-app.get('/', async (req, res, next) => {
 
-    console.log(process.env.PORT)
-    // console.log(routes.db1)
-    // console.log(req.session.id, 'id')
-    // console.log(req.session)
-    // routes.dataB.empty()
-    // let y = await routes.dataB.getAll().catch((err)=>{
-    //     console.log(err)
-    //     routes.dataB.empty()
-    // })
-    
-    // console.log(y)
+
+app.get('/', async (req, res, next) => {
+    if(req.session.isNew){
+        req.session.loggedIn = false
+        req.session.answer = ''
+        req.session.score = null
+    }
+    else if(!req.session){
+        app.use(cookieSession({
+        name: 'session',
+        keys: ['apple', 'orange'],
+
+        maxAge: 24 * 60 * 60 * 1000, 
+        loggedIn: false,
+        }))
+        
+    }    
+   
 
     res.render('index', { item: '' })
     next()
 
 
 })
-.get('/db', async (req, res) => {
-    try {
-      const client = await pool.connect();
-      const result = await client.query('SELECT * FROM test_table');
-      const results = { 'results': (result) ? result.rows : null};
-      res.render('pages/db', results );
-      client.release();
-    } catch (err) {
-      console.error(err);
-      res.send("Error " + err);
-    }
-  })
-
-
-
-
-
-
 
 app.post('/search', async function(req, res, next) {
 
@@ -96,8 +85,12 @@ app.post('/search', async function(req, res, next) {
         res.render('index', { item: ['Invalid Input'] })
         return
     }
+    else if(userInput.trim().length >= 20){
+        userInput = userInput.trim().substring(0,20)
+    }
+    
 
-    let token = '&token=4VDKQB-X24pEbT5eiPFXfX9NeAH_9rwfq6noSTMfknM'
+    let token = '&token=' + process.env.token
     let urlAPI = 'https://trefle.io/api/v1/plants/search?'
     let fullURL = urlAPI + 'q=' + userInput.trim() + token
 
@@ -105,6 +98,11 @@ app.post('/search', async function(req, res, next) {
     let ob = body.data.data.slice(0, 5)
     ob = ob.filter((item)=> item['common_name'] !== null)
     ob = ob.map((item) => { return [item['common_name'], item['id']] })
+
+
+    if(!ob.length){
+        ob = [-1]
+    }
 
     res.render('index', { item: ob })
 
@@ -118,18 +116,17 @@ app.get('/info', async function(req, res) {
     if (plantID === 'potd') {
 
 
-        let apiURL = 'https://trefle.io/api/v1/plants?page=3&'
-        let endU = 'filter_not[common_name]=null&filter_not[image_url]=null&token=4VDKQB-X24pEbT5eiPFXfX9NeAH_9rwfq6noSTMfknM'
+        let apiURL = 'https://trefle.io/api/v1/plants?page='
+        let endU = '&filter_not[common_name]=null&filter_not[image_url]=null&token=' + process.env.token
 
         let d = new Date()
 
-        let potd = d.getDate() + d.getDay() + d.getYear()
+        let potd = d.getDate() + d.getDay()
 
-        let fullURL = apiURL + endU
+        let fullURL = apiURL + potd  + endU
 
         body = await axios.get(fullURL)
             .catch((err) => {
-                console.log('here')
                 console.log(err)
         })
         plantID = body.data.data[0]['id']
@@ -137,7 +134,7 @@ app.get('/info', async function(req, res) {
     }
     
 
-    let fullURL = 'https://trefle.io/api/v1/plants/' + plantID + '?filter_not[common_name]=null&filter_not[image_url]=null&token=4VDKQB-X24pEbT5eiPFXfX9NeAH_9rwfq6noSTMfknM'
+    let fullURL = 'https://trefle.io/api/v1/plants/' + plantID + '?filter_not[common_name]=null&filter_not[image_url]=null&token=' + process.env.token
 
     body = await axios.get(fullURL)
         .catch((err) => {
@@ -152,14 +149,14 @@ app.get('/info', async function(req, res) {
 
 
 app.get('/about', (req, res, next) => {
-
+   
     res.render('about')
 });
 
 app.get('/quizhtml', async (req, res, next) => {
     var qs
     let body = req.query.body
-
+    
     switch (body) {
 
         case 'picguess':
@@ -171,13 +168,11 @@ app.get('/quizhtml', async (req, res, next) => {
             qs = body[0]['correctAnswer']['image_url']
             break;
         default:
-            console.log('default')
+            return -1
 
     }
-
-    routes.dataB.set(req.session.id, body[0])
-    console.log(body[0])
-    res.json({ data: body[1], session_id: req.session.id,question: qs })
+    req.session.answer = body[0]
+    res.json({ data: body[1], session_id: 'item',question: qs })
     next()
 
 })
@@ -185,22 +180,14 @@ app.get('/quizhtml', async (req, res, next) => {
 app.post('/quizhtml', async (req, res, next) => {
     
     let body = req.body
-    let ans = await routes.dataB.get(body.session_id).catch((err)=>{
-        console.log('this happened')
-        console.log(err)
-        return 1
-    })
-
-    // console.log(body)
-    // console.log(ans)
+    let ans = req.session.answer
 
     try{
         ans['correctAnswer']['common_name']
     }
     catch(err){
         console.log('Try error')
-        console.log(err)
-        return
+
     }
 
 
@@ -219,23 +206,35 @@ app.post('/quizhtml', async (req, res, next) => {
         res.send(ans['correctAnswer'])
 
     }
-    routes.dataB.delete(body.session_id)
+
 })
 
 app.post('/quizhtml/score', (req, res, next) =>{
-    console.log(req.body)
+    
     let body = req.body
-    console.log(req.session)
+    req.session.score = body['score']
+    routes.saveScore(req.session.user)
+
+
     res.status(200).send(req.body)
     next()
 })
 
+app.delete('/quizhtml',async (req,res,next) =>{
+    let body = req.body
+    req.session.answer = ''
+
+
+    res.status(200).send('Cleared')
+    next()
+
+})
 
 
 app.get('/quiz', (req, res, next) => {
 
 
-    let user = { loggedIn: false, name: 'testUser', score: 0 }
+    let user = { loggedIn: req.session.loggedIn, name: req.session.user, score: req.session.score }
 
     res.render('quizlett', { user: user })
     next()
@@ -247,56 +246,95 @@ app.get('/quiz', (req, res, next) => {
 
 
 app.get('/login', (req, res, next) => {
-    let user = { loggedIn: false }
 
+    let user = { loggedIn: req.session.loggedIn, message: '' }
     res.render('login-signup', { user: user })
     next()
 })
 
+
+
+
 app.post('/login', async (req, res, next) => {
     let data = req.body
+    let message = ''
+    let user = {loggedIn: false, message: message}
+
 
     if (req.query.signup === 'signup') {
-        console.log('signup')
 
         if (data.userPass.length <= 16 && data.userPass.length >= 8) {
-            console.log(data.userPass.length)
-            routes.newUser(data)
-            res.redirect('/login')
+                        
+            let check = await routes.conn('newUser',data)
+            
+            
+            if(check === 1){
+                message = 'signed Up'
+                user = {loggedIn: false, message: message}    
+                res.render('login-signup', {user: user})
+            
+            }
+            else if(check === 'Username Taken'){
+                message = check
+                user = {loggedIn: false, message: message}
+                res.render('login-signup', {user: user})
+            }
+            else{
+                message = 'Invalid Sign Up! Please Try Again'
+                user = {loggedIn: false, message: message}
+                res.render('login-signup', {user: user})
+            }
+            
+            
         }
         else {
-            res.status(403).render('login-signup')
+            message = 'Invalid Password Length'
+            user = {loggedIn: false, message: message}
+            res.render('login-signup', {user:user})
             res.end()
         }
         next()
     }
     else {
 
-        let userProfile = await routes.findUser(data)
+        let userProfile = await routes.conn('login', data)
+        
         if (userProfile) {
-            var match = await routes.verifyUser(data.userPass, userProfile['hash'])
+            var match = await routes.verifyUser(data.userPass, userProfile[0])
         }
 
+        req.session.loggedIn = match
 
-        let user = { loggedIn: match }
-
-        if (user.loggedIn) {
+        if (req.session.loggedIn) {
+            req.session.score = userProfile[1] 
+        
+            req.session.user = data.username
             user = {
-                name: req.body.username,
-                score: userProfile['score'],
-                loggedIn: true,
+                name: req.session.user,
+                score: userProfile[1],
+                loggedIn: req.session.loggedIn
 
             }
 
             res.render('quizlett', { user: user })
         }
         else {
-            res.redirect('/login')
+            message = 'Invalid Username or Password'
+            user = {loggedIn: false, message: message}
+            res.render('login-signup', {user:user})
         }
 
     }
 
 })
+
+
+app.get('/logout', (req, res, next)=>{
+
+    req.session = null
+    res.redirect('/')
+})
+
 
 
 
@@ -309,7 +347,7 @@ app.use(function(err, req, res, next) {
 
 
 
-app.listen(process.env.PORT, () => {
+app.listen(3000, () => {
     console.log('server started');
-
+   
 });

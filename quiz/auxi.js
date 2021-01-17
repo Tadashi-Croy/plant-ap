@@ -61,7 +61,7 @@ exports.nameGame = async function(){
 
 async function dataGrabber(){
     let apiURL = 'https://trefle.io/api/v1/plants?page='
-    let endU = 'filter_not[common_name]=null&filter_not[image_url]=null&token=4VDKQB-X24pEbT5eiPFXfX9NeAH_9rwfq6noSTMfknM'
+    let endU = 'filter_not[common_name]=null&filter_not[image_url]=null&token='+ process.env.token
     let num = Math.floor(Math.random()*50) + 1
     
     
