@@ -65,11 +65,7 @@ newUser = async function (userInfo, client){
 exports.conn = function (op,data){
 
     const client = new Client({
-    user: process.env.PGUSER,
-    host: process.env.PGHOST,
-    database: process.env.PGDATABASE,
-    password: process.env.PGPASSWORD,
-    port: process.env.PGPORT,
+    connectionString: process.env.DATABASE_URL,
     ssl: {
         rejectUnauthorized: false,
         sslmode : 'require',
@@ -105,11 +101,7 @@ exports.conn = function (op,data){
 exports.saveScore = function(user){
     let sql = format("UPDATE my_db SET score = score + 10 WHERE name = %L", user)
     const client = new Client({
-    user: process.env.PGUSER,
-    host: process.env.PGHOST,
-    database: process.env.PGDATABASE,
-    password: process.env.PGPASSWORD,
-    port: process.env.PGPORT,
+    connectionString: process.env.PGUSER,
     ssl: {
         rejectUnauthorized: false,
         sslmode : 'require',
