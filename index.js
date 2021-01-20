@@ -80,7 +80,14 @@ app.get('/', async (req, res, next) => {
 app.post('/search', async function(req, res, next) {
 
     let userInput = req.body['userInput']
-
+    let searchBy = req.body.searchBy
+    if (searchBy !== 'common_name' && searchBy !== 'scientific_name'){
+        console.log(searchBy)
+        res.status(403).send('DOM Manipulation Detected!')
+        return
+    }
+    
+    
     if (!userInput.trim()) {
         res.render('index', { item: ['Invalid Input'] })
         return
@@ -96,8 +103,8 @@ app.post('/search', async function(req, res, next) {
 
     let body = await axios.get(fullURL)
     let ob = body.data.data.slice(0, 5)
-    ob = ob.filter((item)=> item['common_name'] !== null)
-    ob = ob.map((item) => { return [item['common_name'], item['id']] })
+    ob = ob.filter((item)=> item[searchBy] !== null)
+    ob = ob.map((item) => { return [item[searchBy], item['id']] })
 
 
     if(!ob.length){

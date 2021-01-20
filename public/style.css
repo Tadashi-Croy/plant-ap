@@ -4,7 +4,9 @@
 
 body{
     background: rgb(255, 253, 247);
-    
+    min-width: 300px;
+    margin: 0;
+    padding: 0;
 }
 
 a{
@@ -12,7 +14,6 @@ a{
     text-decoration: none;
 }
 nav{
-    margin: .5rem;
     padding:.5rem;
 }
 button{
@@ -24,24 +25,27 @@ button{
 }
 form{
     background: rgba(255, 255, 255, 0.192);
+    display: flex;
+    flex-direction: column;
+
+
+    margin: auto;
 }
 form > *{
     margin: .2rem;
 }
+form>label{
+    font-weight: 600;
+}
 
-/* 
-main{
-    
-
-
-} */
 
 /* Header */
 
 .header-nav{
     background: rgba(0, 163, 0, 0.308);
-    
-    margin-left: 0;
+    display: flex;
+    justify-content: center;
+    margin-bottom: .75rem;
     padding: 1rem .4rem;
 
 }
@@ -49,13 +53,24 @@ main{
     border: 1px solid rgba(0, 0, 0, 0.733);
     background: white;
     border-radius: 4px;
-    margin: 0;
+    margin: 0 1rem;
     padding: .2rem;
     cursor: pointer;
+    text-align: center;
 }
 .nav-btn:hover{
     background: rgba(0, 0, 255, 0.178);
 }
+.pad{
+    width: 75px;
+    text-align: center;
+}
+.flexed{
+    display: flex;
+    flex-direction: column;
+    
+}
+
 
 
 /* Header End */
@@ -81,9 +96,11 @@ main{
     border: 4px double black;
     background: rgb(224, 224, 224);
     border-radius: 10px;
-    width: fit-content;
+    width: 80%;
     padding: 0 .5rem;
     line-height: 80%;
+    margin: auto;
+    text-align: center;
 
 }
 #potd{
@@ -137,26 +154,62 @@ main{
     transform:unset important;
     background: white important;
     color: red important;
- }
+}
+
+
+/* Index Page end */
+
+/* About Page  */
+
+.center-text{
+    text-align: center;
+
+}
+.about-page >h2{
+    background: white;
+    color: rgb(26, 26, 26);
+}
+.div-p{
+    margin: .5rem;
+
+}
 
 
 
 
 
 
-/* Index Page End */
+/* About Page end */
+/* Login */
+
+#signUpBtn{
+    margin: 1rem;
+    border: 2px solid black;
+    font-weight: 600;
+}
 
 
 
+/* Quiz Page */
+
+#gameQ{
+    text-align: center;
+    margin: auto;
+
+}
 
 
 .card-test{
-    color: blue;
+    color: rgb(0, 0, 0);
     border: 1px solid black;
+    border-radius: 8px;
+    background: rgba(0, 158, 0, 0.11);
+    font-weight: 600;
     width: fit-content;
     padding: .5rem;
     cursor: pointer;
-
+    margin: .5rem auto;
+    font-size: 1.25rem;
 
 }
 
@@ -171,15 +224,10 @@ img{
 
 }
 
-.img-200{
-    
-}
-
 .answer-container{
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr; 
-    margin: auto;
+    display: flex;
+    flex-direction: column;
+
 }
 
 .correct{
@@ -197,5 +245,84 @@ img{
 
 
 
+
+
+
+
+/* Media Queries */
+
+@media screen  and (max-width: 400px) {
+
+    .nav-btn{
+        margin: 0 .25rem;
+
+    }
+    
+}
+@media screen and (min-width: 600px) {
+    .answer-container{
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr 1fr; 
+        margin: auto;
+    }
+    .card-test{
+        font-size: 1.75rem;
+    }
+    form{
+        display: inline;
+        font-size: 1.25rem;
+    }
+    #loginForm{
+        display: flex;
+        flex-direction: column;
+        width: 500px;
+        border: 1px solid black;
+        background: white;
+        border-radius: 9px;
+    }
+    form> *{
+        margin:.5rem;
+
+    }
+    #potd-holder {
+        margin-left: .5rem;
+    }
+    #potd{
+        transform: scale(1.1);
+        margin: .2rem;
+    }
+    #choices{
+        width: fit-content;
+        margin: auto;
+        text-align: center;
+    }
+    #choices> *{
+        transform: scale(1.2);
+    }
+    .head-h1{
+        width: clamp(500px, 40%, 700px)
+    }
+    
+}
+@media screen and (min-width: 750px) {
+    img{
+        height: 300px;
+        width: 300px;
+    }
+    .header-nav{
+        justify-content: flex-start;
+
+    }
+    .header-nav > .nav-btn{
+        width: 200px;
+    }
+
+
+}
+
+
+
+/* Media Queries End */
 
 
