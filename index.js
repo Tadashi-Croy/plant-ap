@@ -82,7 +82,6 @@ app.post('/search', async function(req, res, next) {
     let userInput = req.body['userInput']
     let searchBy = req.body.searchBy
     if (searchBy !== 'common_name' && searchBy !== 'scientific_name'){
-        console.log(searchBy)
         res.status(403).send('DOM Manipulation Detected!')
         return
     }
@@ -193,7 +192,7 @@ app.post('/quizhtml', async (req, res, next) => {
         ans['correctAnswer']['common_name']
     }
     catch(err){
-        console.log('Try error')
+        console.log(err)
 
     }
 

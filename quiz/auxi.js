@@ -68,7 +68,7 @@ async function dataGrabber(){
     let fullURL = apiURL + num + endU
     
     
-    let body = await axios.get(fullURL).catch((item)=>{console.log(item)})
+    let body = await axios.get(fullURL).catch((err)=>{console.log(err)})
     return body
 }
 

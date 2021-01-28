@@ -58,9 +58,6 @@ async function gameChooser() {
     let rData = ii
     let aNodes = answers
     let gameType = quizType.value
-    console.log(ii)
-    console.log(gameType)
-    console.log(answers)
 
     resultsAnalyzer(rData,aNodes, gameType)
 
@@ -145,7 +142,6 @@ function resultsAnalyzer(rData, aNodes, gameType){
 
 async function saveScore() {
     $.post('./quizhtml/score', {score: scoreVal})
-    console.log('done')
 }
 
 
@@ -159,9 +155,6 @@ async function cleanUp(){
             type: 'DELETE',
             data: window.sessionStorage.getItem('id'),
             url:'./quizhtml/',
-            success: ()=>{
-                console.log('Success')
-            },
 
 
     }).done((err)=>{
@@ -179,9 +172,6 @@ if(window.location.pathname === '/search'){
         $('.card a').click(()=>{
             event.preventDefault()
         })
-        console.log('here')
-    }else{
-        console.log($('#choices')[0].innerText)
     }
     $('.card')
 
